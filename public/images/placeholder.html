@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Placeholder Images</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    .placeholder {
+      width: 800px;
+      height: 600px;
+      margin: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #1976d2;
+      border: 2px solid #1976d2;
+      background-color: #f0f4f8;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .placeholder h1 {
+      font-size: 40px;
+      margin: 0 0 20px 0;
+    }
+    .placeholder p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    .download-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .download-btn:hover {
+      background-color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Placeholder Images</h1>
+  
+  <div class="placeholder" id="biometric">
+    <h1>Biometric Terminal</h1>
+    <p>800 × 600</p>
+    <button class="download-btn" onclick="downloadImage('biometric', 'biometric-terminal.jpg')">Download</button>
+  </div>
+
+  <div class="placeholder" id="secure-access">
+    <h1>Secure Access</h1>
+    <p>800 × 600</p>
+    <button class="download-btn" onclick="downloadImage('secure-access', 'secure-access.jpg')">Download</button>
+  </div>
+
+  <div class="placeholder" id="timetrack">
+    <h1>TimeTrack 360°</h1>
+    <p>800 × 600</p>
+    <button class="download-btn" onclick="downloadImage('timetrack', 'timetrack.jpg')">Download</button>
+  </div>
+
+  <script>
+    async function downloadImage(elementId, filename) {
+      const element = document.getElementById(elementId);
+      const canvas = await html2canvas(element);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/jpeg', 0.9);
+      link.click();
+    }
+    
+    // Load html2canvas from CDN
+    const script = document.createElement('script');
+    script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+    document.head.appendChild(script);
+  </script>
+</body>
+</html>

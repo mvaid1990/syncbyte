@@ -1,0 +1,515 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Typography, 
+  Container, 
+  Card, 
+  CardContent, 
+  CardMedia, 
+  Box, 
+  Button, 
+  Chip, 
+  Tabs, 
+  Tab, 
+  useTheme,
+  useMediaQuery,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Divider,
+  alpha,
+} from '@mui/material';
+import { 
+  ArrowBack as ArrowBackIcon, 
+  ArrowForward as ArrowForwardIcon, 
+  Close as CloseIcon,
+  Star as StarIcon,
+  CheckCircle as CheckCircleIcon
+} from '@mui/icons-material';
+import Layout from '../../components/Layout';
+import PageHeader from '../../components/PageHeader';
+import { siteConfig } from '../../config/site';
+
+// Types for grid components
+interface GridContainerProps {
+  children: React.ReactNode;
+  spacing?: number | string;
+  sx?: any;
+}
+
+interface GridItemProps {
+  children: React.ReactNode;
+  xs?: number;
+  sm?: number;
+  md?: number;
+  lg?: number;
+  sx?: any;
+}
+
+// Simple grid container component
+const GridContainer: React.FC<GridContainerProps> = ({ 
+  children, 
+  spacing = 4, 
+  sx = {},
+  ...props 
+}) => (
+  <Box 
+    sx={{ 
+      display: 'grid',
+      gridTemplateColumns: { 
+        xs: '1fr', 
+        sm: 'repeat(2, 1fr)', 
+        md: 'repeat(3, 1fr)', 
+        lg: 'repeat(3, 1fr)' 
+      },
+      gap: spacing,
+      ...sx 
+    }}
+    {...props}
+  >
+    {children}
+  </Box>
+);
+
+// Extended GridItem props to include motion props and component prop
+interface GridItemProps {
+  children: React.ReactNode;
+  xs?: number;
+  sm?: number;
+  md?: number;
+  lg?: number;
+  sx?: any;
+  component?: React.ElementType;
+  initial?: any;
+  animate?: any;
+  exit?: any;
+  transition?: any;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+}
+
+// Simple grid item component with motion support
+const GridItem: React.FC<GridItemProps> = ({ 
+  xs = 12, 
+  sm, 
+  md, 
+  lg, 
+  children, 
+  sx = {},
+  component: Component = 'div',
+  ...props 
+}) => {
+  const { initial, animate, exit, transition, onMouseEnter, onMouseLeave, ...rest } = props;
+  
+  return (
+    <Box
+      component={Component}
+      sx={{
+        width: {
+          xs: '100%',
+          sm: sm ? `calc(${(100 / 12) * sm}% - 16px)` : '100%',
+          md: md ? `calc(${(100 / 12) * md}% - 16px)` : '100%',
+          lg: lg ? `calc(${(100 / 12) * lg}% - 16px)` : '100%',
+        },
+        ...sx
+      }}
+      initial={initial}
+      animate={animate}
+      exit={exit}
+      transition={transition}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      {...rest}
+    >
+      {children}
+    </Box>
+  );
+};
+
+// Product interface for type safety
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+  features: string[];
+  category: string;
+  price: string;
+  specs: Record<string, string>;
+  images?: string[];
+  rating?: number;
+  reviews?: number;
+}
+
+// Category filter type
+type Category = 'All' | 'Biometric Terminals' | 'Access Control' | 'Time & Attendance' | 'Video Surveillance';
+
+export default function Products() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [selectedCategory, setSelectedCategory] = useState<Category>('All');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState<number | null>(null);
+
+  // Get products from site config and cast to mutable array
+  const allProducts = [...siteConfig.products] as unknown as Product[];
+
+  // Get unique categories
+  const categories = ['All', ...Array.from(new Set(allProducts.map(p => p.category)))] as Category[];
+
+  // Filter products by selected category
+  const filteredProducts = selectedCategory === 'All' 
+    ? allProducts 
+    : allProducts.filter(product => product.category === selectedCategory);
+    
+  // Handle category change
+  const handleCategoryChange = (event: React.SyntheticEvent, newValue: Category) => {
+    setSelectedCategory(newValue);
+  };
+
+  return (
+    <Layout>
+      <PageHeader
+        title="Advanced Security Products"
+        subtitle="Discover our comprehensive range of cutting-edge security solutions designed to protect your business, employees, and assets with the latest technology."
+        backgroundImage="/images/headers/products-bg.jpg"
+        ctaText="Request a Demo"
+        ctaLink="/contact"
+      />
+      
+      <Container maxWidth="xl" sx={{ py: 8, position: 'relative' }}>
+        <Box sx={{ 
+          width: '100%', 
+          mb: 8,
+          textAlign: 'center',
+          '&::after': {
+            content: '""',
+            display: 'block',
+            width: '80px',
+            height: '4px',
+            backgroundColor: theme.palette.primary.main,
+            margin: '16px auto 0',
+            borderRadius: '2px',
+          }
+        }}>
+          <Typography variant="h3" component="h2" sx={{ 
+            fontWeight: 700, 
+            mb: 2,
+            color: 'text.primary',
+            fontSize: { xs: '2rem', md: '2.5rem' }
+          }}>
+            Our Product Categories
+          </Typography>
+          <Typography variant="h6" sx={{ 
+            color: 'text.secondary', 
+            maxWidth: '700px',
+            mx: 'auto',
+            mb: 4,
+            fontWeight: 400,
+            lineHeight: 1.6
+          }}>
+            Explore our comprehensive range of security products designed to meet your specific needs and requirements.
+          </Typography>
+          
+          <Tabs
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
+            sx={{
+              mt: 4,
+              '& .MuiTabs-indicator': {
+                height: 3,
+                borderRadius: '4px 4px 0 0',
+                backgroundColor: theme.palette.primary.main,
+              },
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '1rem',
+                py: 1.5,
+                px: 3,
+                minWidth: 'auto',
+                minHeight: 'auto',
+                color: theme.palette.text.secondary,
+                '&.Mui-selected': {
+                  color: theme.palette.primary.main,
+                },
+                '&:hover': {
+                  color: theme.palette.primary.dark,
+                  opacity: 1,
+                },
+              },
+            }}
+          >
+            <Tab label="All Products" />
+            {categories.map((category, index) => (
+              <Tab 
+                key={category} 
+                label={category} 
+                iconPosition="start"
+              />
+            ))}
+          </Tabs>
+        </Box>
+
+        {/* Products Grid */}
+        <AnimatePresence>
+          <GridContainer spacing={4}>
+            {filteredProducts.map((product, index) => (
+              <GridItem 
+                key={product.id}
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3}
+                component={motion.div}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                onMouseEnter={() => setIsHovered(product.id)}
+                onMouseLeave={() => setIsHovered(null)}
+              >
+                <Card 
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: `0 10px 30px -5px ${alpha(theme.palette.primary.main, 0.2)}`,
+                      '& .product-image': {
+                        transform: 'scale(1.05)',
+                      },
+                      '& .product-cta': {
+                        opacity: 1,
+                        transform: 'translateY(0)',
+                      },
+                    },
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    position: 'relative',
+                  }}
+                  onMouseEnter={() => setIsHovered(product.id)}
+                  onMouseLeave={() => setIsHovered(null)}
+                >
+                  {product.category && (
+                    <Chip
+                      label={product.category}
+                      size="small"
+                      sx={{
+                        position: 'absolute',
+                        top: 16,
+                        right: 16,
+                        zIndex: 1,
+                        fontWeight: 600,
+                        backgroundColor: theme.palette.primary.main,
+                        color: theme.palette.primary.contrastText,
+                        boxShadow: theme.shadows[2],
+                      }}
+                    />
+                  )}
+                  <Box sx={{ 
+                    position: 'relative', 
+                    overflow: 'hidden',
+                    height: '220px',
+                    backgroundColor: theme.palette.grey[100],
+                  }}>
+                    <CardMedia
+                      component="img"
+                      image={product.image}
+                      alt={product.name}
+                      className="product-image"
+                      sx={{
+                        height: '100%',
+                        width: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 0.5s ease',
+                      }}
+                    />
+                    <Box 
+                      className="product-cta"
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: 2,
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+                        opacity: 0,
+                        transform: 'translateY(20px)',
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      <Button 
+                        variant="contained" 
+                        fullWidth 
+                        size="large"
+                        onClick={() => {
+                          setSelectedProduct(product);
+                          setCurrentImageIndex(0);
+                          setIsDialogOpen(true);
+                        }}
+                        sx={{
+                          fontWeight: 600,
+                          textTransform: 'none',
+                          py: 1,
+                          borderRadius: 2,
+                        }}
+                      >
+                        View Details
+                      </Button>
+                    </Box>
+                  </Box>
+                  <CardContent sx={{ flexGrow: 1, p: 3, display: 'flex', flexDirection: 'column' }}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography gutterBottom variant="h6" component="h3" sx={{ 
+                        fontWeight: 700, 
+                        mb: 1.5,
+                        color: 'text.primary',
+                        minHeight: '56px',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}>
+                        {product.name}
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary" sx={{ 
+                        mb: 2, 
+                        minHeight: '72px',
+                        lineHeight: 1.6,
+                      }}>
+                        {product.description}
+                      </Typography>
+                    </Box>
+                    
+                    <Box sx={{ mt: 'auto' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        {Array(5).fill(0).map((_, i) => (
+                          <StarIcon 
+                            key={i} 
+                            sx={{ 
+                              color: i < (product.rating || 5) ? theme.palette.warning.main : theme.palette.action.disabled,
+                              fontSize: '1.2rem',
+                            }} 
+                          />
+                        ))}
+                        <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                          ({product.reviews || Math.floor(Math.random() * 100) + 1} reviews)
+                        </Typography>
+                      </Box>
+                      
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        mt: 'auto',
+                        pt: 2,
+                        borderTop: `1px solid ${theme.palette.divider}`
+                      }}>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                            Starting at
+                          </Typography>
+                          <Typography variant="h6" color="primary" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                            {product.price}
+                          </Typography>
+                        </Box>
+                        <Button 
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setCurrentImageIndex(0);
+                            setIsDialogOpen(true);
+                          }}
+                          sx={{ 
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            px: 2,
+                            py: 1,
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                            },
+                            transition: 'all 0.3s ease',
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </GridItem>
+            ))}
+          </GridContainer>
+        </AnimatePresence>
+      </Container>
+
+      {/* Product Details Dialog */}
+      <Dialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        {selectedProduct && (
+          <>
+            <DialogTitle>{selectedProduct.name}</DialogTitle>
+            <DialogContent>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body1">{selectedProduct.description}</Typography>
+                <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Features:</Typography>
+                <ul>
+                  {selectedProduct.features.map((feature, index) => (
+                    <li key={index}>
+                      <Typography variant="body2">{feature}</Typography>
+                    </li>
+                  ))}
+                </ul>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button 
+                onClick={() => setIsDialogOpen(false)}
+                color="inherit"
+              >
+                Close
+              </Button>
+              <Button 
+                variant="contained" 
+                color="primary"
+                onClick={() => {
+                  window.location.href = '/contact';
+                }}
+                sx={{
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  px: 4,
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: 3,
+                  },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                Contact Sales
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
+    </Layout>
+  );
+}

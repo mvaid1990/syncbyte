@@ -1,0 +1,14 @@
+<svg width="200" height="80" viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Globe Icon -->
+  <circle cx="45" cy="40" r="25" fill="none" stroke="#1565C0" stroke-width="3"/>
+  <ellipse cx="45" cy="40" rx="10" ry="25" fill="none" stroke="#1565C0" stroke-width="2"/>
+  <line x1="20" y1="40" x2="70" y2="40" stroke="#1565C0" stroke-width="2"/>
+  <path d="M 45 15 Q 35 25, 45 35 T 45 55 T 45 65" fill="none" stroke="#1565C0" stroke-width="2"/>
+  
+  <!-- Dollar Sign -->
+  <text x="55" y="48" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#FF9800">$</text>
+  
+  <!-- Text -->
+  <text x="80" y="35" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1565C0">Global</text>
+  <text x="80" y="52" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#424242">Finance</text>
+</svg>

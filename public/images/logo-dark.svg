@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield Icon with Gradient -->
+  <path d="M35 15C35 14.4477 35.4477 14 36 14H44C44.5523 14 45 14.4477 45 15V25.5C45 35.7173 41.6667 45.5 40 45.5C38.3333 45.5 35 35.7173 35 25.5V15Z" fill="url(#paint0_linear)"/>
+  <path d="M40 45.5C40 45.5 35 35.5 35 25.5V15L40 10L45 15V25.5C45 35.5 40 45.5 40 45.5Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 45.5V10" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- BioMax Text -->
+  <text x="70" y="38" font-family="'Inter', sans-serif" font-size="24" font-weight="700" fill="#333">BioMax</text>
+  <text x="70" y="52" font-family="'Inter', sans-serif" font-size="12" font-weight="500" fill="#666">SECURITY SOLUTIONS</text>
+  
+  <defs>
+    <linearGradient id="paint0_linear" x1="35" y1="14" x2="45" y2="45.5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5e92f3"/>
+      <stop offset="1" stop-color="#1565c0"/>
+    </linearGradient>
+    
+    <!-- Add Inter font for better typography -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    </style>
+  </defs>
+</svg>

@@ -1,0 +1,445 @@
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { 
+  AppBar, 
+  Box, 
+  Button, 
+  Container, 
+  CssBaseline, 
+  Drawer, 
+  IconButton, 
+  List, 
+  ListItem, 
+  ListItemButton, 
+  ListItemText, 
+  Toolbar, 
+  Typography, 
+  useScrollTrigger,
+  useTheme,
+  useMediaQuery,
+  Menu,
+  MenuItem,
+  Badge,
+  Avatar,
+  Stack,
+  Divider,
+  styled
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PersonIcon from '@mui/icons-material/Person';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { siteConfig } from '../config/site';
+import Head from 'next/head';
+import Link from 'next/link';
+import Image from 'next/image';
+
+const drawerWidth = 280;
+
+interface Props {
+  children: React.ReactNode;
+  window?: () => Window;
+}
+
+// Styled components
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  background: 'linear-gradient(135deg, #1a237e 0%, #283593 100%)',
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+  transition: 'all 0.3s ease',
+  '&.scrolled': {
+    background: 'rgba(26, 35, 126, 0.98)',
+    backdropFilter: 'blur(10px)',
+    padding: '0.5rem 0',
+  },
+}));
+
+const NavButton = styled(Button)(({ theme }) => ({
+  color: 'white',
+  textTransform: 'none',
+  fontWeight: 500,
+  fontSize: '0.95rem',
+  padding: '0.5rem 1rem',
+  borderRadius: '8px',
+  '&:hover': {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  '&.active': {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    fontWeight: 600,
+  },
+}));
+
+export default function Layout({ children, window }: Props) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeLink, setActiveLink] = useState('');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<{[key: string]: boolean}>({});
+
+  // Handle scroll effect
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Set active link based on current path
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setActiveLink(window.location.pathname);
+    }
+  }, []);
+  
+  const handleClick = (event: React.MouseEvent<HTMLElement>, key: string) => {
+    setAnchorEl(event.currentTarget);
+    setMobileMenuOpen(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleMobileMenuToggle = (key: string) => {
+    setMobileMenuOpen(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const drawer = (
+    <Box 
+      sx={{ 
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: 'background.paper',
+        color: 'text.primary',
+      }}
+      onClick={handleDrawerToggle}
+    >
+      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Box 
+          component="img"
+          src="https://www.esslsecurity.com/wp-content/uploads/2023/04/essl-security-logo-white.png"
+          alt={siteConfig.company.name}
+          sx={{ height: 40, width: 'auto' }}
+        />
+      </Box>
+      <Box sx={{ overflowY: 'auto', flexGrow: 1, p: 2 }}>
+        {siteConfig.navigation.map((item) => (
+          <React.Fragment key={item.name}>
+            <ListItem 
+              disablePadding 
+              sx={{ 
+                display: 'block',
+                mb: 1,
+                '&:last-child': { mb: 0 }
+              }}
+            >
+              <ListItemButton 
+                href={item.href}
+                selected={activeLink === item.href}
+                sx={{
+                  borderRadius: 1,
+                  '&.Mui-selected': {
+                    backgroundColor: 'primary.main',
+                    color: 'primary.contrastText',
+                    '&:hover': {
+                      backgroundColor: 'primary.dark',
+                    },
+                  },
+                }}
+              >
+                <ListItemText 
+                  primary={item.name} 
+                  primaryTypographyProps={{
+                    fontWeight: activeLink === item.href ? 600 : 'normal',
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          </React.Fragment>
+        ))}
+      </Box>
+      <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+        <Button 
+          fullWidth 
+          variant="contained" 
+          color="primary" 
+          href="/contact"
+          startIcon={<PersonIcon />}
+          sx={{ mb: 1 }}
+        >
+          Contact Sales
+        </Button>
+        <Button 
+          fullWidth 
+          variant="outlined" 
+          color="primary" 
+          href="/support"
+        >
+          Support
+        </Button>
+      </Box>
+    </Box>
+  );
+
+  const container = window !== undefined ? () => window().document.body : undefined;
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <CssBaseline />
+      <Head>
+        <title>{siteConfig.company.name} - {siteConfig.company.tagline}</title>
+        <meta name="description" content={siteConfig.company.description} />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      
+      {/* Top Bar */}
+      <Box sx={{ bgcolor: 'primary.dark', color: 'white', py: 0.5, fontSize: '0.875rem' }}>
+        <Container maxWidth="xl">
+          <Stack 
+            direction="row" 
+            justifyContent="space-between" 
+            alignItems="center"
+            sx={{ px: { xs: 0, md: 2 } }}
+          >
+            <Stack direction="row" spacing={3}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography variant="caption">
+                  <Box component="span" sx={{ mr: 1 }}>📞</Box>
+                  {siteConfig.company.contact.phone}
+                </Typography>
+              </Box>
+              <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
+                <Typography variant="caption">
+                  <Box component="span" sx={{ mr: 1 }}>✉️</Box>
+                  {siteConfig.company.contact.email}
+                </Typography>
+              </Box>
+            </Stack>
+            <Stack direction="row" spacing={2}>
+              <IconButton size="small" sx={{ color: 'white' }}>
+                <SearchIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" sx={{ color: 'white' }}>
+                <Badge badgeContent={0} color="secondary">
+                  <ShoppingCartIcon fontSize="small" />
+                </Badge>
+              </IconButton>
+              <Button 
+                variant="outlined" 
+                size="small" 
+                href="/login"
+                startIcon={<PersonIcon />}
+                sx={{
+                  color: 'white',
+                  borderColor: 'rgba(255,255,255,0.3)',
+                  '&:hover': {
+                    borderColor: 'white',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                  },
+                }}
+              >
+                Login
+              </Button>
+            </Stack>
+          </Stack>
+        </Container>
+      </Box>
+
+      {/* Main Navigation */}
+      <StyledAppBar 
+        position="sticky" 
+        elevation={0}
+        className={scrolled ? 'scrolled' : ''}
+      >
+        <Container maxWidth="xl">
+          <Toolbar 
+            disableGutters 
+            sx={{ 
+              py: scrolled ? 0.5 : 1.5,
+              transition: 'all 0.3s ease',
+            }}
+          >
+            {/* Mobile menu button */}
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
+              <IconButton
+                size="large"
+                aria-label="menu"
+                onClick={handleDrawerToggle}
+                color="inherit"
+                edge="start"
+              >
+                <MenuIcon />
+              </IconButton>
+            </Box>
+
+            {/* Logo */}
+            <Box 
+              component="a" 
+              href="/" 
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                color: 'inherit',
+                mr: { xs: 'auto', md: 4 },
+              }}
+            >
+              <Box 
+                component="img"
+                src="https://www.esslsecurity.com/wp-content/uploads/2023/04/essl-security-logo-white.png"
+                alt={siteConfig.company.name}
+                sx={{ 
+                  height: scrolled ? 40 : 48,
+                  width: 'auto',
+                  transition: 'all 0.3s ease',
+                }}
+              />
+            </Box>
+
+            {/* Desktop Navigation */}
+            <Box sx={{ 
+              flexGrow: 1, 
+              display: { xs: 'none', md: 'flex' },
+              justifyContent: 'center',
+              ml: 4,
+            }}>
+              {siteConfig.navigation.map((item) => (
+                <NavButton
+                  key={item.name}
+                  href={item.href}
+                  className={activeLink === item.href ? 'active' : ''}
+                >
+                  {item.name}
+                </NavButton>
+              ))}
+            </Box>
+
+            {/* Action Buttons */}
+            <Box sx={{ 
+              display: { xs: 'none', md: 'flex' },
+              alignItems: 'center',
+              gap: 2,
+              ml: 2
+            }}>
+              <Button 
+                variant="outlined" 
+                color="inherit"
+                href="/demo"
+                sx={{
+                  borderColor: 'rgba(255,255,255,0.3)',
+                  '&:hover': {
+                    borderColor: 'white',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                  },
+                }}
+              >
+                Request Demo
+              </Button>
+              <Button 
+                variant="contained" 
+                color="secondary" 
+                href="/contact"
+                sx={{
+                  fontWeight: 600,
+                  boxShadow: '0 4px 14px rgba(255, 152, 0, 0.4)',
+                  '&:hover': {
+                    boxShadow: '0 6px 20px rgba(255, 152, 0, 0.5)',
+                  },
+                }}
+              >
+                Contact Sales
+              </Button>
+            </Box>
+          </Toolbar>
+        </Container>
+      </StyledAppBar>
+
+      <Box component="nav">
+        <Drawer
+          container={container}
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+
+      <Box component="main" sx={{ flexGrow: 1, pt: { xs: 8, md: 10 } }}>
+        {children}
+      </Box>
+
+      <Box component="footer" sx={{ bgcolor: 'background.paper', py: 6, mt: 'auto' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 4 }}>
+            <Box sx={{ mb: { xs: 4, md: 0 } }}>
+              <Typography variant="h6" gutterBottom>
+                {siteConfig.company.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {siteConfig.company.tagline}
+              </Typography>
+            </Box>
+            
+            <Box>
+              <Typography variant="subtitle1" gutterBottom>Quick Links</Typography>
+              <List dense>
+                {siteConfig.navigation.map((item) => (
+                  <ListItem key={item.name} disablePadding>
+                    <Button href={item.href} sx={{ color: 'text.secondary', justifyContent: 'flex-start' }}>
+                      {item.name}
+                    </Button>
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+            
+            <Box>
+              <Typography variant="subtitle1" gutterBottom>Contact Us</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {siteConfig.company.contact.address}
+                <br />
+                {siteConfig.company.contact.phone}
+                <br />
+                {siteConfig.company.contact.email}
+              </Typography>
+            </Box>
+          </Box>
+          
+          <Box sx={{ mt: 4, pt: 4, borderTop: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
+              © {new Date().getFullYear()} {siteConfig.company.name}. All rights reserved.
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
+    </Box>
+  );
+}
